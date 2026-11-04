@@ -24,11 +24,29 @@ TU MISIÓN:
 class CuadernoTractatus:
     def __init__(self, autor: str):
         self.autor = autor
-        # TODO Misión 1: Encapsula este atributo como privado (`self.__proposiciones = []`)
-        self.proposiciones = []
+        # Misión 1: Encapsulamiento como atributo privado (`self.__proposiciones`)
+        self.__proposiciones = []
 
     def registrar_hecho(self, proposicion: str) -> None:
-        # TODO Misión 2: Si `proposicion` está vacía, lanza ValueError
-        self.proposiciones.append(proposicion)
+        # Misión 2: Validación de invariantes (solo proposiciones con sentido)
+        if not proposicion or not proposicion.strip():
+            raise ValueError("De lo que no tiene sentido, hay que callar: la proposición no puede estar vacía.")
+        self.__proposiciones.append(proposicion)
 
-    # TODO Misión 3: Crea @property def hechos(self) -> tuple que retorne tuple(self.__proposiciones)
+    # Misión 3: Propiedad de solo lectura que devuelve una tupla inmutable
+    @property
+    def hechos(self) -> tuple:
+        return tuple(self.__proposiciones)
+
+
+if __name__ == "__main__":
+    import sys
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
+    print("📓 Ejecutando simulación en el Río Piave (1918)...")
+    cuaderno = CuadernoTractatus("Ludwig Wittgenstein")
+    cuaderno.registrar_hecho("1.1 El mundo es la totalidad de los hechos, no de las cosas.")
+    cuaderno.registrar_hecho("7. De lo que no se puede hablar, hay que callar.")
+    print(f"• Hechos registrados (tupla inmutable): {cuaderno.hechos}")
+    print(f"• ¿Existe atributo público `proposiciones`?: {hasattr(cuaderno, 'proposiciones')}")
