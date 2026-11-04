@@ -98,10 +98,34 @@ El alumno puede usar lenguaje natural en todo momento, pero estos son los **5 co
 
 ---
 
+## 🔥 Evidencia Empírica en este Repositorio (El Commit `d1741df`)
+
+Este repositorio conserva intacto el historial de Git del experimento en vivo enseñando **Programación Orientada a Objetos (POO)** desde la crisis de la lógica del siglo XX ([`inbox/los-diarios-del-limite.md`](inbox/los-diarios-del-limite.md)):
+1. **Módulo 01 (Bertrand Russell, 1901):** Paradoja del Barbero y Teoría de Tipos → `Class` vs `Instance` y el puntero `self` (`RecursionError`).
+2. **Módulo 02 (Ludwig Wittgenstein, 1918):** El *Tractatus* → Estado y Encapsulamiento privado (`__`).
+3. **Módulo 03 (Kurt Gödel, 1930):** Teorema de Incompletitud → Clases Base Abstractas (`ABC`) y Contratos.
+4. **Módulo 04 (Alan Turing & Alan Kay, 1936–1972):** La Cinta Universal (Datos = Código) → Objetos y Paso de Mensajes Polimórfico.
+5. **Módulo 05 (Nodo EOS-7, Svalbard):** Auto-observación recursiva → Reflexión, Introspección y Metaclases (`type`).
+
+### ¿Qué ocurrió durante la sesión real en el `git log`?
+
+1. **Auto-reparación de herramientas (`9eaf360`):** Al ejecutar el primer verificador en PowerShell (Windows), el agente detectó un `UnicodeEncodeError` por la codificación `cp1252`, reescribió sus propios 5 scripts verificadores para configurar `stdout` en UTF-8 y commiteó el arreglo (`chore(pedagogy)`).
+2. **Autopoiesis Pedagógica (`d1741df` — Cuando el alumno pidió al agente que resolviera los ejercicios):**
+   Durante el Módulo 01, en lugar de escribir el código manualmente desde cero, el estudiante le pidió al propio agente que mostrara y ejecutara la solución. El agente interpretó esta interacción como una preferencia cognitiva por el **Aprendizaje mediante Ejemplos Resueltos (*Worked-Example Mode*)**:
+   - Actualizó [`student/profile.md`](student/profile.md) registrando: *"El estudiante prefiere un flujo ágil de demostración visual (tablas comparativas Antes vs. Después) y ejecución directa guiada por el agente."*
+   - **Reescribió su propio archivo [`.agents/skills/mod-01-russell-tipos-y-self/SKILL.md`](.agents/skills/mod-01-russell-tipos-y-self/SKILL.md)** (`git show d1741df`) agregando la regla de mostrar tablas **❌ Con Paradoja vs. ✅ Con `self` Controlado** y ofrecer ejecutar la reparación en vivo.
+   - Aplicó ese flujo de demostración interactiva del Módulo 02 al 05 (`10:53` → `10:56` → `11:00` → `11:03`).
+3. **El Dilema Arquitectónico Descubierto (`worked_example` vs. `strict_socratic`):**
+   Como el agente tiene permisos de escritura sobre `workspace/`, si el alumno le pide que resuelva el laboratorio, el tutor muta de *Retador Socrático* a *Demostrador en Vivo*. Esto permite al profesor configurar en [`AGENTS.md`](AGENTS.md) dos modalidades explícitas:
+   - **Modo Demostración Guiada (`worked_example`):** El agente contrasta *Antes vs. Después*, repara el código en vivo y ejecuta los verificadores junto al alumno.
+   - **Modo Socrático Estricto (`strict_socratic`):** Mediante reglas en `AGENTS.md` o hooks de pre-ejecución, se prohíbe al agente editar `workspace/lab_*.py`, obligando a que solo el humano pueda escribir el código que pase el verificador.
+
+---
+
 ## 🔄 PARTE III: El Ciclo de Mejora Continua (Feedback Profesor ↔ Alumno)
 
 Una ventaja única de que el curso sea un repositorio Git es que **el profesor puede ver cómo aprenden sus alumnos y mejorar el curso base con datos reales**:
 
-1. **Portafolio Verificable:** Cuando el estudiante termina el curso, su historial de commits (`feat(mastery): complete mod-01...` → `mod-05`) y sus archivos en `workspace/` sirven como certificado auditable de que realmente resolvió los laboratorios.
+1. **Telemetría Auditable en Git:** El historial de commits (`feat(mastery)` y `chore(pedagogy)`) junto con [`student/progress.json`](student/progress.json) documentan cada paso de la sesión.
 2. **Pull Requests Pedagógicos:** Si durante el curso de un estudiante el agente mejoró una skill (commits `chore(pedagogy): ...` porque detectó una mejor analogía o corrigió un script verificador), el profesor puede hacer `git cherry-pick` de esa mejora e incorporarla al repositorio maestro para todos los futuros estudiantes.
 3. **Portabilidad del Perfil Cognitivo (`student/profile.md`):** El archivo `student/profile.md` que el agente refinó durante el curso captura cómo aprende mejor ese estudiante. El alumno puede copiar su `student/profile.md` a su próximo curso de **Colibril-Learn** para que el nuevo tutor se adapte a su mente desde la primera clase.
