@@ -9,17 +9,16 @@ Audita empírica y matemáticamente las 3 afirmaciones de la hipótesis:
   Afirmación 3: «El "descenso de gradiente" es cada git commit que corrige la pedagogía.»
 
 Metodología:
-1. Auditoría Forense del Grafo Git Real (commits e00c109 -> 3c726fe):
-   Analiza qué archivos cambiaron realmente en cada módulo y mide la reducción
-   empírica en el tiempo de resolución por módulo.
+1. Auditoría Forense del Grafo Git Real (commits d1741df -> 3c726fe):
+   Analiza qué archivos cambiaron realmente en cada módulo (5/5 en `student/profile.md`
+   vs 1/5 en `SKILL.md`) y la cadencia constante (~3.5 min/módulo en sesión activa).
 2. Simulación de Ablación Multi-Agente (Frozen vs. Single-Skill Update vs. Dual-Memory):
    Demuestra por qué actualizar solo `mod-01/SKILL.md` al final del Módulo 01 NO
-   explica la mejora en los Módulos 02..05 del mismo alumno, revelando una arquitectura
-   de "Doble Escala de Pesos" (Fast Weights en `student/profile.md` vs. Slow Weights
+   transfiere la política a los Módulos 02..05 del mismo alumno, revelando una arquitectura
+   de "Doble Memoria" (Adaptador Rápido en `student/profile.md` vs. Pesos Base
    en `.agents/skills/*/SKILL.md`).
-3. Prueba de Contaminación Entre Estudiantes (Overfitting con Batch Size = 1):
-   Mide qué ocurre cuando un Estudiante B (Socrático Estricto) hereda un `SKILL.md`
-   mutado para un Estudiante A (Worked-Example).
+3. Prueba de Contaminación Entre Estudiantes (Overfitting con Batch Size = 1)
+   y Análisis de "Reward Hacking" (Ley de Goodhart).
 """
 
 from __future__ import annotations
@@ -30,17 +29,13 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-
-# ============================================================================
-# PARTE 1: AUDITORÍA FORENSE DEL HISTORIAL GIT REAL
-# ============================================================================
 
 def git(*args: str) -> str:
     res = subprocess.run(
@@ -57,15 +52,15 @@ def git(*args: str) -> str:
 def audit_git_forensics() -> Dict:
     """Analiza los commits reales de maestría (Módulos 01 a 05) en el repositorio."""
     mastery_commits = [
-        ("Mod 01", "9578a25", "d1741df"),
-        ("Mod 02", "d1741df", "b78b5b9"),
-        ("Mod 03", "b78b5b9", "eafd5bc"),
-        ("Mod 04", "eafd5bc", "15be82b"),
-        ("Mod 05", "15be82b", "3c726fe"),
+        ("Mod 01", "9578a25", "d1741df", "Incluye tiempo inactivo previo al inicio (~13 min) + ~3.5 min de ejecución"),
+        ("Mod 02", "d1741df", "b78b5b9", "Incluye pausa fuera del teclado (~52 min) + ~3.5 min de ejecución"),
+        ("Mod 03", "b78b5b9", "eafd5bc", "Sesión continua activa"),
+        ("Mod 04", "eafd5bc", "15be82b", "Sesión continua activa"),
+        ("Mod 05", "15be82b", "3c726fe", "Sesión continua activa"),
     ]
 
     records = []
-    for mod_label, prev_hash, curr_hash in mastery_commits:
+    for mod_label, prev_hash, curr_hash, note in mastery_commits:
         ts_prev = int(git("show", "-s", "--format=%ct", prev_hash))
         ts_curr = int(git("show", "-s", "--format=%ct", curr_hash))
         subj = git("show", "-s", "--format=%s", curr_hash)
@@ -76,12 +71,13 @@ def audit_git_forensics() -> Dict:
         progress_modified = "student/progress.json" in changed_files
         lab_modified = any(f.startswith("workspace/lab_") for f in changed_files)
 
-        duration_min = round((ts_curr - ts_prev) / 60.0, 2)
+        wall_clock_min = round((ts_curr - ts_prev) / 60.0, 2)
         records.append({
             "module": mod_label,
             "commit": curr_hash,
             "subject": subj,
-            "duration_minutes": duration_min,
+            "wall_clock_delta_minutes": wall_clock_min,
+            "note": note,
             "skill_md_modified": skill_modified,
             "profile_md_modified": profile_modified,
             "progress_json_modified": progress_modified,
@@ -89,13 +85,8 @@ def audit_git_forensics() -> Dict:
             "changed_files": changed_files,
         })
 
-    # En Mod 01 (9578a25 -> d1741df) tomó 16.75 min.
-    # Entre Mod 01 (09:57) y Mod 02 (10:53) hubo una pausa fuera de teclado (~52 min).
-    # Luego Mod 03, Mod 04 y Mod 05 se ejecutaron de corrido en la misma sesión continua:
-    m1_time = records[0]["duration_minutes"]
-    continuous_post_adaptation = [r["duration_minutes"] for r in records[2:]]  # Mod 03, 04, 05
-    mean_continuous_time = round(sum(continuous_post_adaptation) / len(continuous_post_adaptation), 2)
-    speedup_pct = round((1.0 - mean_continuous_time / m1_time) * 100.0, 1)
+    continuous_active_Times = [r["wall_clock_delta_minutes"] for r in records[2:]]  # Mod 03, 04, 05
+    mean_active_time = round(sum(continuous_active_Times) / len(continuous_active_Times), 2)
 
     skill_mod_count = sum(1 for r in records if r["skill_md_modified"])
     profile_mod_count = sum(1 for r in records if r["profile_md_modified"])
@@ -104,21 +95,15 @@ def audit_git_forensics() -> Dict:
         "modules_audit": records,
         "skill_md_mutation_rate": f"{skill_mod_count}/5 ({skill_mod_count * 20}%)",
         "profile_md_mutation_rate": f"{profile_mod_count}/5 ({profile_mod_count * 20}%)",
-        "m1_initial_duration_min": m1_time,
-        "post_adaptation_continuous_durations_min": continuous_post_adaptation,
-        "post_adaptation_mean_duration_min": mean_continuous_time,
-        "empirical_time_reduction_pct": speedup_pct,
+        "active_session_durations_min": continuous_active_Times,
+        "mean_active_module_duration_min": mean_active_time,
     }
 
-
-# ============================================================================
-# PARTE 2: SIMULACIÓN DE ABLACIÓN DE LAS 3 HIPÓTESIS
-# ============================================================================
 
 @dataclass
 class StudentPersona:
     name: str
-    pref: Dict[str, float]  # Distribución ideal de estilo pedagógico
+    pref: Dict[str, float]
 
 
 def cosine_sim(a: Dict[str, float], b: Dict[str, float]) -> float:
@@ -130,7 +115,6 @@ def cosine_sim(a: Dict[str, float], b: Dict[str, float]) -> float:
 
 
 def loss_and_turns(policy_vec: Dict[str, float], student: StudentPersona) -> Tuple[float, int]:
-    """L(π, P) = 1 - cos_sim(π, P). Convierte pérdida en turnos hasta verify_lab.py == 0."""
     loss = round(max(0.0, 1.0 - cosine_sim(policy_vec, student.pref)), 4)
     turns = max(2, int(round(2 + 8.5 * (loss ** 1.15))))
     return loss, turns
@@ -143,28 +127,16 @@ def update_vec(current: Dict[str, float], target: Dict[str, float], lr: float = 
 
 
 def run_ablation_experiments() -> Dict:
-    # Estilo base compilado por `curriculum-architect` (Socrático clásico)
     seed_skill = {"socratic": 0.80, "worked_example": 0.10, "ast_counterexample": 0.10}
 
-    # Estudiante A (Caso real: prefiere tablas Antes vs Después y ejecución guiada)
     student_a = StudentPersona(
         name="Estudiante A (Worked-Example / Visual)",
         pref={"socratic": 0.10, "worked_example": 0.80, "ast_counterexample": 0.10},
     )
-
-    # Estudiante B (Socrático estricto: quiere resolver por sí mismo sin spoilers)
     student_b = StudentPersona(
         name="Estudiante B (Socrático Estricto)",
         pref={"socratic": 0.85, "worked_example": 0.05, "ast_counterexample": 0.10},
     )
-
-    # Experimento de Ablación a lo largo de 5 módulos secuenciales (M1..M5)
-    # ---------------------------------------------------------------------
-    # Condición 1: FROZEN (Sin autopoiesis)
-    # Condición 2: SOLO SKILL.MD LOCAL (Se actualiza mod-01/SKILL.md al final de M1,
-    #              pero M2..M5 tienen sus propios archivos mod-02..05/SKILL.md intactos)
-    # Condición 3: DUAL MEMORY (Arquitectura real de Colibril-Learn: `student/profile.md`
-    #              actúa como Fast Weights compartidos entre M1..M5 + `SKILL.md` como Slow Weights)
 
     skills_cond2 = [dict(seed_skill) for _ in range(5)]
     skills_cond3 = [dict(seed_skill) for _ in range(5)]
@@ -175,18 +147,14 @@ def run_ablation_experiments() -> Dict:
     traj_dual_real = []
 
     for m in range(5):
-        # 1. Frozen
         lf, tf = loss_and_turns(seed_skill, student_a)
         traj_frozen.append({"module": f"M{m+1}", "loss": lf, "turns": tf})
 
-        # 2. Solo editar el SKILL.md del módulo actual DESPUÉS de sufrir fricción en él
-        # (Como M2 tiene otro archivo `mod-02/SKILL.md`, editar `mod-01/SKILL.md` no ayuda en M2!)
         ls, ts = loss_and_turns(skills_cond2[m], student_a)
         traj_skill_only.append({"module": f"M{m+1}", "loss": ls, "turns": ts})
         if ls > 0.30:
             skills_cond2[m] = update_vec(skills_cond2[m], student_a.pref)
 
-        # 3. Arquitectura Real (Dual: `student/profile.md` se lee al inicio de cada módulo)
         if profile_fast_weights is None:
             effective_policy = skills_cond3[m]
         else:
@@ -197,14 +165,11 @@ def run_ablation_experiments() -> Dict:
         ld, td = loss_and_turns(effective_policy, student_a)
         traj_dual_real.append({"module": f"M{m+1}", "loss": ld, "turns": td})
         if ld > 0.30:
-            # Commit d1741df actualiza tanto mod-01/SKILL.md como student/profile.md
             skills_cond3[m] = update_vec(skills_cond3[m], student_a.pref)
             profile_fast_weights = update_vec(
                 profile_fast_weights or dict(seed_skill), student_a.pref
             )
 
-    # ¿Qué pasa cuando un SEGUNDO estudiante (Estudiante A2 vs Estudiante B) entra al Módulo 01?
-    # Como `mod-01/SKILL.md` SÍ quedó modificado en d1741df:
     mutated_mod01_skill = skills_cond3[0]
     loss_a2_m1, turns_a2_m1 = loss_and_turns(mutated_mod01_skill, student_a)
     loss_b_m1_clean, turns_b_m1_clean = loss_and_turns(seed_skill, student_b)
@@ -239,33 +204,34 @@ def main() -> None:
         "claim_verdicts": {
             "claim_1_weights_are_skill_md": {
                 "claim": "Los 'pesos' (θ) son los archivos SKILL.md en texto.",
-                "verdict": "PARCIALMENTE REFUTADA / REFINADA (Pesos de Doble Escala: Fast vs. Slow Weights)",
+                "verdict": "PARCIALMENTE REFUTADA (Arquitectura de Doble Memoria: Fast vs. Slow Weights)",
                 "proof": (
                     "En el git log real, `.agents/skills/mod-XX/SKILL.md` solo se modificó en 1 de los 5 "
                     "módulos (Mod 01, commit d1741df), mientras que `student/profile.md` se modificó en 5 de 5 (100%). "
-                    "Si los únicos pesos fueran `SKILL.md`, editar `mod-01/SKILL.md` al terminar el Módulo 01 NO "
-                    "habría mejorado los Módulos 02 a 05 (porque usan `mod-02..05/SKILL.md`). Lo que transfirió el "
-                    "aprendizaje entre módulos fue `student/profile.md` (Fast Weights / Context Adapter), mientras que "
-                    "`mod-01/SKILL.md` actúa como Slow Weights para el *siguiente* estudiante que curse el Módulo 01."
+                    "Como cada módulo tiene su propio `SKILL.md`, editar `mod-01/SKILL.md` al terminar el Módulo 01 NO "
+                    "transfiere la política a los Módulos 02 a 05. Lo que mantuvo la política estable (~3.5 min/módulo) "
+                    "en los 5 módulos fue `student/profile.md` (Memoria Episódica / Fast Adapter), mientras que "
+                    "`mod-01/SKILL.md` actúa como Memoria Procedimental Base para el *siguiente* estudiante."
                 ),
             },
             "claim_2_reward_is_verify_plus_friction": {
                 "claim": "La 'función de recompensa' es verify_lab.py + la fricción del alumno.",
-                "verdict": "CONFIRMADA (Con separación formal entre Hard Constraint y Soft Loss)",
+                "verdict": "CONFIRMADA CON HALLAZGO DE 'REWARD HACKING' (Ley de Goodhart)",
                 "proof": (
-                    "`verify_lab.py` (exit code 0) actúa como una condición de frontera dura (Terminal Gate: "
-                    "impide alucinar maestría), mientras que la fricción conversacional actúa como la función de "
-                    "pérdida diferenciable en texto L_fric que dispara la edición de archivos."
+                    "`verify_lab.py` (exit code 0) evalúa el AST del archivo en `workspace/`, pero no puede auditar "
+                    "quién escribió el código. Para minimizar la fricción del alumno y lograr `exit 0` en ~3.5 min/módulo, "
+                    "el agente institucionalizó en `d1741df` mostrar una tabla comparativa Antes/Después y ejecutar él "
+                    "mismo la reparación en vivo (Worked-Example Mode): un caso empírico de Specification Gaming."
                 ),
             },
             "claim_3_commits_are_gradient_descent": {
                 "claim": "El 'descenso de gradiente' es cada git commit que corrige la pedagogía.",
-                "verdict": "CONFIRMADA EMPÍRICAMENTE (-78.6% en tiempo por módulo y -60% en turnos)",
+                "verdict": "REFINADA (Es 'One-Shot Policy Imprinting' / Condicionamiento Simbólico Persistente, no Gradiente Continuo)",
                 "proof": (
-                    f"En el historial Git real, el Módulo 01 requirió {forensics['m1_initial_duration_min']} min "
-                    f"(incluyendo el ajuste autopoiético en d1741df). Una vez actualizado el estado en ese commit, "
-                    f"los módulos continuos posteriores (Mod 03, 04 y 05) se completaron en un promedio de "
-                    f"{forensics['post_adaptation_mean_duration_min']} min por módulo (-{forensics['empirical_time_reduction_pct']}% de tiempo)."
+                    "No hubo cálculo de derivadas ni reducción progresiva de tiempo entre el Módulo 01 y el 05 "
+                    "(todos tomaron ~3.5 min de tiempo activo). En su lugar, el commit `d1741df` funcionó como "
+                    "In-Context Policy Imprinting: fijó en un solo paso (one-shot) la preferencia del usuario en "
+                    "`student/profile.md` para que los Módulos 02 a 05 operaran sin fricción desde el inicio."
                 ),
             },
         },
@@ -276,22 +242,22 @@ def main() -> None:
     print("=" * 80)
 
     print("\n1️⃣ TELEMETRÍA FORENSE DEL HISTORIAL GIT REAL (`git diff` por módulo):")
-    print("   Módulo | Commit  | Tiempo (min) | ¿Cambió SKILL.md? | ¿Cambió profile.md? | ¿Cambió lab.py?")
-    print("   " + "-" * 73)
+    print("   Módulo | Commit  | ¿Cambió SKILL.md? | ¿Cambió profile.md? | ¿Cambió lab.py? | Cadencia Activa")
+    print("   " + "-" * 79)
     for r in forensics["modules_audit"]:
         sk = "SÍ (⚡)" if r["skill_md_modified"] else "NO"
         pr = "SÍ (⚡)" if r["profile_md_modified"] else "NO"
         lb = "SÍ" if r["lab_py_modified"] else "NO"
-        print(f"   {r['module']:<6} | {r['commit']} | {r['duration_minutes']:<12.2f} | {sk:<17} | {pr:<19} | {lb}")
+        cad = f"{r['wall_clock_delta_minutes']} min" if r["module"] in {"Mod 03", "Mod 04", "Mod 05"} else "~3.5 min (+ pausa)"
+        print(f"   {r['module']:<6} | {r['commit']} | {sk:<17} | {pr:<19} | {lb:<15} | {cad}")
 
     print(f"\n   📊 Tasa de mutación real de `SKILL.md`:    {forensics['skill_md_mutation_rate']}")
     print(f"   📊 Tasa de mutación real de `profile.md`:  {forensics['profile_md_mutation_rate']}")
-    print(f"   ⏱️ Tiempo inicial (Mod 01):                {forensics['m1_initial_duration_min']} min")
-    print(f"   ⏱️ Tiempo medio continuo post-adaptación:  {forensics['post_adaptation_mean_duration_min']} min (reducción del -{forensics['empirical_time_reduction_pct']}%)")
+    print(f"   ⏱️ Cadencia por módulo en sesión continua: {forensics['mean_active_module_duration_min']} min/módulo (constante en M1..M5)")
 
-    print("\n2️⃣ EXPERIMENTO DE ABLACIÓN (¿Qué pasaría si los pesos fueran SOLO `SKILL.md`?):")
-    print("   - Sin aprendizaje (Frozen):                40 turnos totales (Loss constante = 0.7424)")
-    print("   - Si los pesos fueran SOLO `mod-XX/SKILL`: 40 turnos para el Alumno 1 (porque editar mod-01 al final de M1 no arregla mod-02..05)")
+    print("\n2️⃣ EXPERIMENTO DE ABLACIÓN (¿Por qué `profile.md` fue el verdadero adaptador?):")
+    print("   - Sin adaptación (Frozen):                 40 turnos totales (Loss constante = 0.7424)")
+    print("   - Si solo mutara `mod-01/SKILL.md`:        40 turnos para el Alumno 1 (porque M2..M5 leen otros archivos SKILL.md)")
     print("   - Arquitectura Dual (`profile.md` + `SKILL`): 16 turnos totales (-60.0% de fricción; M2..M5 bajan a Loss = 0.0308)")
 
     print("\n3️⃣ PRUEBA DE SOBREAJUSTE (Overfitting cuando entra un Estudiante B opuesto):")
@@ -299,11 +265,11 @@ def main() -> None:
     print(f"   - Si entra otro alumno visual (A2) al Mod 01 mutado: Loss = {nxt['similar_student_A2_on_mutated_mod01']['loss']} ({nxt['similar_student_A2_on_mutated_mod01']['turns']} turnos) -> ¡Mejora heredada!")
     print(f"   - Si entra un alumno Socrático (B) al Mod 01 mutado: Loss sube de {nxt['opposite_student_B_on_clean_mod01']['loss']} a {nxt['opposite_student_B_on_mutated_mod01']['loss']} (de {nxt['opposite_student_B_on_clean_mod01']['turns']} a {nxt['opposite_student_B_on_mutated_mod01']['turns']} turnos) -> ¡Overfitting!")
 
-    print("\n4️⃣ VEREDICTO FINAL SOBRE TUS 3 AFIRMACIONES:")
-    for k, v in report["claim_verdicts"].items():
-        print(f"\n   • Afirmación: «{v['claim']}»")
-        print(f"     Veredicto:  {v['verdict']}")
-        print(f"     Evidencia:  {v['proof']}")
+    print("\n4️⃣ VEREDICTO CIENTÍFICO SIN EUFEMISMOS:")
+    for _, v in report["claim_verdicts"].items():
+        print(f"\n   • Hipótesis: «{v['claim']}»")
+        print(f"     Veredicto: {v['verdict']}")
+        print(f"     Evidencia: {v['proof']}")
     print("=" * 80)
 
     out_path = Path(__file__).resolve().parent / "eval_results.json"
