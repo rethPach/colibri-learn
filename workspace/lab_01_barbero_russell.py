@@ -66,6 +66,9 @@ class Barbero:
 
 
 if __name__ == "__main__":
+    import sys
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     print("🪒 Ejecutando simulación en Richmond Park (1901)...")
     herrero = Aldeano("Herrero", se_afeita_solo=False)
     panadero = Aldeano("Panadero", se_afeita_solo=True)
