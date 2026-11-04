@@ -1,6 +1,6 @@
 {
   "course_title": "Del Filo de la Navaja al Objeto Consciente: POO desde Russell hasta Turing",
-  "current_module": "mod-03-godel-abstraccion-y-contratos",
+  "current_module": "mod-04-turing-maquina-universal-y-mensajes",
   "modules": [
     {
       "id": "mod-01-russell-tipos-y-self",
@@ -21,15 +21,15 @@
     {
       "id": "mod-03-godel-abstraccion-y-contratos",
       "title": "Capítulo 3: La Jaula de los Axiomas (Gödel -> Abstracción, Contratos e Incompletitud)",
-      "status": "in_progress",
+      "status": "completed",
       "lab_file": "workspace/lab_03_godel_abstraccion.py",
       "verifier": ".agents/skills/mod-03-godel-abstraccion-y-contratos/scripts/verify_lab03.py",
-      "completed_at": null
+      "completed_at": "2026-11-04T10:56:55-04:00"
     },
     {
       "id": "mod-04-turing-maquina-universal-y-mensajes",
       "title": "Capítulo 4: El Corredor y la Cinta Infinita (Turing -> Objetos, Métodos y Paso de Mensajes)",
-      "status": "locked",
+      "status": "in_progress",
       "lab_file": "workspace/lab_04_turing_mensajes.py",
       "verifier": ".agents/skills/mod-04-turing-maquina-universal-y-mensajes/scripts/verify_lab04.py",
       "completed_at": null

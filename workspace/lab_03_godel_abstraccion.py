@@ -20,19 +20,38 @@ TU MISIÓN:
 from abc import ABC, abstractmethod
 
 
-# TODO Misión 1: Hereda de ABC y convierte `demostrar` en @abstractmethod
-class SistemaFormal:
+# Misión 1: Contrato abstracto gödeliano con ABC y @abstractmethod
+class SistemaFormal(ABC):
+    @abstractmethod
     def demostrar(self, enunciado: str) -> str:
-        return "TODO"
+        """Contrato abstracto: ningún sistema cerrado se instancia sin implementación."""
+        pass
 
 
-class SistemaAritmetico:
+class SistemaAritmetico(SistemaFormal):
     def demostrar(self, enunciado: str) -> str:
-        # TODO Misión 2
-        return "TODO"
+        # Misión 2: Reconoce su incompletitud ante el enunciado autorreferencial G
+        if "no es demostrable" in enunciado:
+            return "INCOMPLETO"
+        return "DEMOSTRADO"
 
 
-class MetaSistemaGodel:
+class MetaSistemaGodel(SistemaFormal):
     def demostrar(self, enunciado: str) -> str:
-        # TODO Misión 3
-        return "TODO"
+        # Misión 3: Observa desde el metanivel y valida la verdad de G
+        if "no es demostrable" in enunciado:
+            return "VERDADERO_DESDE_METANIVEL"
+        return "DEMOSTRADO"
+
+
+if __name__ == "__main__":
+    import sys
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
+    print("🏛️ Ejecutando simulación en Königsberg (1930)...")
+    enunciado_g = "G: Esta proposicion no es demostrable en SistemaAritmetico"
+    aritmetica = SistemaAritmetico()
+    metasistema = MetaSistemaGodel()
+    print(f"• SistemaAritmetico ante G: {aritmetica.demostrar(enunciado_g)}")
+    print(f"• MetaSistemaGodel ante G:  {metasistema.demostrar(enunciado_g)}")
