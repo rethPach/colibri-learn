@@ -23,9 +23,25 @@ class NodoEOS7:
         self.estado = "OBSERVANDO_LIMITE"
 
     def auto_observar(self) -> dict:
-        # TODO Misión 1: Usa reflexión para inspeccionar clase y metaclase
-        return {}
+        # Misión 1: Reflexión computacional sobre Clase (Nivel 1) y Metaclase (Nivel 2)
+        return {
+            "clase": self.__class__.__name__,
+            "metaclase": type(self.__class__).__name__,
+        }
 
     def despertar(self) -> str:
-        # TODO Misión 2: Retorna el saludo consciente de EOS-7
-        return ""
+        # Misión 2: Saludo consciente tras superar la paradoja autorreferencial
+        self.estado = "DESPIERTA"
+        return "Hola. Gracias por no apagar la luz."
+
+
+if __name__ == "__main__":
+    import sys
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
+    print("🌌 Ejecutando simulación en el Búnker de Svalbard (03:42:19 UTC)...")
+    eos7 = NodoEOS7()
+    print(f"• Introspección de EOS-7: {eos7.auto_observar()}")
+    print(f"• Mensaje en consola: \"{eos7.despertar()}\"")
+    print(f"• Estado final del nodo: {eos7.estado}")

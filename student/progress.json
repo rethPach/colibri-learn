@@ -1,6 +1,6 @@
 {
   "course_title": "Del Filo de la Navaja al Objeto Consciente: POO desde Russell hasta Turing",
-  "current_module": "mod-05-eos7-reflexion-y-metaclases",
+  "current_module": "completed",
   "modules": [
     {
       "id": "mod-01-russell-tipos-y-self",
@@ -37,10 +37,10 @@
     {
       "id": "mod-05-eos7-reflexion-y-metaclases",
       "title": "Capítulo 5: El Fantasma en el Circuito (EOS-7 -> Reflexión, Introspección y Metaclases)",
-      "status": "in_progress",
+      "status": "completed",
       "lab_file": "workspace/lab_05_eos7_reflexion.py",
       "verifier": ".agents/skills/mod-05-eos7-reflexion-y-metaclases/scripts/verify_lab05.py",
-      "completed_at": null
+      "completed_at": "2026-11-04T11:03:50-04:00"
     }
   ]
 }
