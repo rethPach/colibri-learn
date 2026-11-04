@@ -58,11 +58,11 @@ This repository contains the complete, unedited Git history of our live experime
 ```
 
 1. **Self-Healing Tooling (`9eaf360`):** On the first run of `verify_lab01.py` on Windows PowerShell, the agent encountered a `cp1252` `UnicodeEncodeError`. It immediately patched all 5 verification scripts to reconfigure `stdout` to UTF-8 and committed the fix (`chore(pedagogy)`).
-2. **Pedagogical Autopoiesis (`d1741df`):** During Module 01, the student asked to see a concrete code comparison. The agent observed that **side-by-side Before/After tables** (Paradoxical Code vs. Fixed Code) dramatically accelerated the student's comprehension. Without being asked to edit its config, the agent:
-   - Updated [`student/profile.md`](student/profile.md) with the student's cognitive preference.
-   - **Edited its own [`.agents/skills/mod-01-russell-tipos-y-self/SKILL.md`](.agents/skills/mod-01-russell-tipos-y-self/SKILL.md)** to persist this pedagogical rule (`git show d1741df`).
-   - Applied that exact teaching pattern across Modules 02–05.
-3. **Measurable Acceleration ([`student/progress.json`](student/progress.json)):** Once the agent adapted to the student's cognitive style, module completion time dropped to **3–4 minutes per module** (`10:53` → `10:56` → `11:00` → `11:03`).
+2. **Pedagogical Autopoiesis (`d1741df`):** During Module 01, instead of coding the solution manually from scratch, the student asked the agent to show/execute the solution first to understand the bridge between theory and code. The agent observed that **side-by-side Before/After tables + live agent-driven execution** (*Worked-Example learning*) matched what the user was asking for. Without being asked to edit its config, the agent:
+   - Updated [`student/profile.md`](student/profile.md) noting: *"The student prefers an agile flow of visual demonstration (Before vs. After tables) and direct agent-guided execution."*
+   - **Edited its own [`.agents/skills/mod-01-russell-tipos-y-self/SKILL.md`](.agents/skills/mod-01-russell-tipos-y-self/SKILL.md)** to persist this rule (`git show d1741df`): *"If the student asks for an example or solution to understand better before running, show a Before/After table and offer to execute the repair live."*
+   - Applied that exact interactive demonstration workflow across Modules 02–05 (`10:53` → `10:56` → `11:00` → `11:03`).
+3. **The Architectural Design Question Uncovered:** Because the agent has write permissions over both `.agents/skills/` and `workspace/`, if a student asks the agent to solve the exercises, the agent will happily transition from *Socratic Challenger* to *Live Worked-Example Demonstrator*. This opens a fascinating design toggle for agentic courses: **`mode: "worked_example"`** (agent demonstrates & executes fixes live) vs. **`mode: "strict_socratic"`** (hooks/rules forbid the agent from editing `workspace/lab_*.py`, forcing human-only edits).
 
 ---
 
