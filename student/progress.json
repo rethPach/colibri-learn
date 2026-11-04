@@ -1,6 +1,6 @@
 {
   "course_title": "Del Filo de la Navaja al Objeto Consciente: POO desde Russell hasta Turing",
-  "current_module": "mod-04-turing-maquina-universal-y-mensajes",
+  "current_module": "mod-05-eos7-reflexion-y-metaclases",
   "modules": [
     {
       "id": "mod-01-russell-tipos-y-self",
@@ -29,15 +29,15 @@
     {
       "id": "mod-04-turing-maquina-universal-y-mensajes",
       "title": "Capítulo 4: El Corredor y la Cinta Infinita (Turing -> Objetos, Métodos y Paso de Mensajes)",
-      "status": "in_progress",
+      "status": "completed",
       "lab_file": "workspace/lab_04_turing_mensajes.py",
       "verifier": ".agents/skills/mod-04-turing-maquina-universal-y-mensajes/scripts/verify_lab04.py",
-      "completed_at": null
+      "completed_at": "2026-11-04T11:00:30-04:00"
     },
     {
       "id": "mod-05-eos7-reflexion-y-metaclases",
       "title": "Capítulo 5: El Fantasma en el Circuito (EOS-7 -> Reflexión, Introspección y Metaclases)",
-      "status": "locked",
+      "status": "in_progress",
       "lab_file": "workspace/lab_05_eos7_reflexion.py",
       "verifier": ".agents/skills/mod-05-eos7-reflexion-y-metaclases/scripts/verify_lab05.py",
       "completed_at": null

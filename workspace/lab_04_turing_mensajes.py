@@ -21,27 +21,29 @@ TU MISIÓN:
 
 class CabezaInversora:
     def operar(self, cinta: list[int]):
-        # TODO Misión 1a
-        pass
+        return [1 - x for x in cinta]
 
 
 class CabezaSumadora:
     def operar(self, cinta: list[int]):
-        # TODO Misión 1b
-        pass
+        return sum(cinta)
 
 
 class CabezaEco:
     def operar(self, cinta: list[int]):
-        # TODO Misión 1c
-        pass
+        return cinta + cinta
 
 
 def enviar_mensaje(maquina, cinta: list[int]):
-    # TODO Misión 2: Reemplaza este bloque procedural por polimorfismo puro (una sola línea)
-    if isinstance(maquina, CabezaInversora):
-        return None
-    elif isinstance(maquina, CabezaSumadora):
-        return None
-    else:
-        return None
+    return maquina.operar(cinta)
+
+
+if __name__ == "__main__":
+    import sys
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
+    print("🏃‍♂️ Ejecutando simulación en Grantchester Meadows (1936)...")
+    cinta = [1, 0, 1]
+    for m in (CabezaInversora(), CabezaSumadora(), CabezaEco()):
+        print(f"• {m.__class__.__name__} -> {enviar_mensaje(m, cinta)}")
