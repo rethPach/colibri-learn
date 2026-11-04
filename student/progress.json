@@ -1,19 +1,19 @@
 {
   "course_title": "Del Filo de la Navaja al Objeto Consciente: POO desde Russell hasta Turing",
-  "current_module": "mod-01-russell-tipos-y-self",
+  "current_module": "mod-02-wittgenstein-estado-y-encapsulamiento",
   "modules": [
     {
       "id": "mod-01-russell-tipos-y-self",
       "title": "Capítulo 1: El Filo de la Navaja (Russell -> Tipos, Clases e Instancias y self)",
-      "status": "in_progress",
+      "status": "completed",
       "lab_file": "workspace/lab_01_barbero_russell.py",
       "verifier": ".agents/skills/mod-01-russell-tipos-y-self/scripts/verify_lab01.py",
-      "completed_at": null
+      "completed_at": "2026-11-04T09:57:09-04:00"
     },
     {
       "id": "mod-02-wittgenstein-estado-y-encapsulamiento",
       "title": "Capítulo 2: El Silencio en las Trincheras (Wittgenstein -> Estado, Hechos y Encapsulamiento)",
-      "status": "locked",
+      "status": "in_progress",
       "lab_file": "workspace/lab_02_tractatus_encapsulamiento.py",
       "verifier": ".agents/skills/mod-02-wittgenstein-estado-y-encapsulamiento/scripts/verify_lab02.py",
       "completed_at": null

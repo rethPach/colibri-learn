@@ -52,3 +52,4 @@ description: >-
    - *«¿Cómo aplica aquí la distinción de Russell entre la regla para el conjunto de clientes externos y la condición base de identidad (`cliente is self`)?»*
 3. Pídele que edite `workspace/lab_01_barbero_russell.py` para resolver las 2 misiones del archivo y luego verifica con:
    `python .agents/skills/mod-01-russell-tipos-y-self/scripts/verify_lab01.py`
+4. **Aprendizaje Autopoiético (Refinamiento Pedagógico):** Si el estudiante pide un ejemplo o solución para comprender mejor antes de ejecutar, muéstrale una tabla comparativa **❌ Con Paradoja (Bucle Infinito) vs. ✅ Con `self` Controlado (Caso Base `cliente is self`)** y ofrécele ejecutar la reparación en vivo para observar el contraste inmediato en consola.

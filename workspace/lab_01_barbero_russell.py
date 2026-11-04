@@ -34,30 +34,24 @@ class Aldeano:
         self.afeitado = False
 
 
-# TODO Misión 1: Haz que Barbero herede de Aldeano -> class Barbero(Aldeano):
-class Barbero:
+# Misión 1: Barbero hereda de Aldeano (Jerarquía de Tipos)
+class Barbero(Aldeano):
     """
     El único barbero del municipio.
-    Actualmente NO hereda de Aldeano y su método `afeitar` cae en la Paradoja de Russell.
+    Hereda de Aldeano y controla su autorreferencia mediante `self`.
     """
 
     def __init__(self, nombre: str):
-        # Si heredas de Aldeano, puedes inicializar con super().__init__(nombre, se_afeita_solo=False)
-        self.nombre = nombre
-        self.se_afeita_solo = False
-        self.afeitado = False
+        super().__init__(nombre, se_afeita_solo=False)
 
     def afeitar(self, cliente) -> bool:
         """
-        Regla municipal defectuosa (Autorreferencia sin control de identidad).
-        ¡CUIDADO! Si `cliente` es `self`, se llama a sí mismo hasta reventar la pila.
+        Regla municipal con Teoría de Tipos y control de identidad (`self`).
         """
-        # TODO Misión 2: Detecta si `cliente is self` para romper el bucle infinito
-        # antes de que ocurra el colapso recursivo.
+        # Misión 2: Condición base de identidad frente al espejo (`cliente is self`)
         if cliente is self:
-            # Simulación de la Paradoja de Russell: para decidir si me afeito,
-            # primero debo verificar qué hace el barbero conmigo...
-            return self.afeitar(cliente)
+            self.afeitado = True
+            return True
 
         if not cliente.se_afeita_solo:
             cliente.afeitado = True
