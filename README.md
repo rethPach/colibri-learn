@@ -1,6 +1,8 @@
 # 🐦 Colibril-Learn: Manual Operativo del Profesor y del Estudiante
 *Arquitectura de Repositorios Educativos Autopoiéticos con Antigravity + Git*
 
+> 🌐 **[🇪🇸 Leer en Español](./README.md)** | **[🇺🇸 Read in English](./README_EN.md)**
+
 ---
 
 ## 📖 Visión General del Sistema
